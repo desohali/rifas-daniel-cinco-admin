@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Canvas con Rayos</title>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+
+<body>
+  <input type="color" id="colorPicker" value="#00ff00">
+  <canvas id="myCanvas" width="500" height="250"></canvas>
+
+  <script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+    const colorPicker = document.getElementById('colorPicker');
+
+    // Dibujar los rayos
+    function drawRays(color) {
+      const width = canvas.width;
+      const height = canvas.height;
+      const centerX = width / 2;
+      const centerY = height / 2;
+      const numRays = 50;
+      const angleIncrement = (2 * Math.PI) / numRays;
+      const extendedLength = Math.sqrt(width * width + height * height); // Longitud extendida para salir del canvas
+
+      // Limpiar el canvas antes de dibujar
+      ctx.clearRect(0, 0, width, height);
+
+      // Dibujar un fondo radial
+      const radialGradient = ctx.createRadialGradient(centerX, centerY, 10, centerX, centerY, extendedLength / 2);
+      radialGradient.addColorStop(0, 'white');
+      radialGradient.addColorStop(1, color);
+      ctx.fillStyle = radialGradient;
+      ctx.fillRect(0, 0, width, height);
+
+      // Dibujar los rayos
+      for (let i = 0; i < numRays; i++) {
+        const angle = i * angleIncrement;
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY);
+        ctx.lineTo(centerX + Math.cos(angle) * extendedLength, centerY + Math.sin(angle) * extendedLength);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 4;
+        ctx.stroke();
+      }
+    }
+
+    // Cambiar el color de los rayos cuando se selecciona un nuevo color
+    colorPicker.addEventListener('input', (event) => {
+      const selectedColor = event.target.value;
+      drawRays(selectedColor);
+    });
+
+    // Dibujar los rayos iniciales
+    drawRays(colorPicker.value);
+  </script>
+</body>
+
+</html>

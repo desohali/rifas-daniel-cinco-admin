@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cajas Sorpresa Animadas</title>
+  <style>
+    body {
+      margin: 0;
+      background: #f2f2f2;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    canvas {
+      border: 2px solid #333;
+      background: white;
+    }
+  </style>
+</head>
+
+<body>
+  <canvas id="gameCanvas" width="450" height="600"></canvas>
+
+  <script>
+    const canvas = document.getElementById("gameCanvas");
+    const ctx = canvas.getContext("2d");
+
+    const boxImg = new Image();
+    boxImg.src = "caja.png";
+
+    const prizeImg = new Image();
+    prizeImg.src = "joker2.png";
+
+    const prize100milImg = new Image();
+    prize100milImg.src = "fire.jpg";
+
+    const premiosRandom = [prizeImg, prize100milImg, prizeImg, prize100milImg, prizeImg, prize100milImg];
+
+    const boxes = [];
+    const confetti = [];
+
+    const numBoxes = 4;
+    const boxWidth = 225;
+    const boxHeight = 225;
+
+    // Crear cajas
+    let x = 0;
+    let y = 75;
+    for (let i = 0; i < numBoxes; i++) {
+      boxes.push({
+        x: x,
+        y: y,
+        width: boxWidth,
+        height: boxHeight,
+        offset: Math.random() * 1000,
+        opened: false,
+        prizeImg: null, // 🔹 aquí guardaremos el premio cuando se abra
+        current: { x: 0, y: 0, w: 0, h: 0 } // posición real animada
+      });
+
+      if (x == 225) {
+        x = 0;
+        y += 225;
+      } else {
+        x += 225;
+      }
+
+    }
+
+    // Detectar clic en cualquier parte de la caja animada
+    canvas.addEventListener("click", (e) => {
+      const rect = canvas.getBoundingClientRect();
+      const mouseX = e.clientX - rect.left;
+      const mouseY = e.clientY - rect.top;
+
+      boxes.forEach((box) => {
+        const b = box.current;
+        if (
+          mouseX >= b.x &&
+          mouseX <= b.x + b.w &&
+          mouseY >= b.y &&
+          mouseY <= b.y + b.h
+        ) {
+          if (!box.opened) {
+            box.opened = true;
+
+            // 🔹 Asignar un premio aleatorio una sola vez
+            box.prizeImg = premiosRandom[Math.floor(Math.random() * premiosRandom.length)];
+
+            spawnConfetti(box);
+          }
+        }
+      });
+    });
+
+    // Crear confeti
+    function spawnConfetti(box) {
+      const b = box.current;
+      for (let i = 0; i < 50; i++) {
+        confetti.push({
+          x: b.x + b.w / 2,
+          y: b.y + b.h / 2,
+          dx: (Math.random() - 0.5) * 4,
+          dy: -Math.random() * 5 - 2,
+          size: Math.random() * 6 + 3,
+          color: `hsl(${Math.random() * 360}, 100%, 60%)`,
+          life: 100 + Math.random() * 50
+        });
+      }
+    }
+
+    // Dibujar confeti
+    function drawConfetti() {
+      for (let i = confetti.length - 1; i >= 0; i--) {
+        const c = confetti[i];
+        c.x += c.dx;
+        c.y += c.dy;
+        c.dy += 0.15;
+        c.life--;
+        ctx.fillStyle = c.color;
+        ctx.fillRect(c.x, c.y, c.size, c.size);
+        if (c.life <= 0) confetti.splice(i, 1);
+      }
+    }
+
+    // Animar
+    // let premioRandom = premiosRandom[Math.floor(Math.random() * premiosRandom.length)];
+    function animate(time) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      boxes.forEach((box) => {
+        const floatY = Math.sin((time + box.offset) * 0.003) * 10;
+        const scale = 1 + Math.sin((time + box.offset) * 0.005) * 0.03;
+
+        const scaledWidth = box.width * scale;
+        const scaledHeight = box.height * scale;
+        const drawX = box.x - (scaledWidth - box.width) / 2;
+        // const drawY = box.y - scaledHeight / 2 + floatY;
+        const drawY = box.y + floatY;
+
+        // Guardamos el área real de la caja animada para detectar clics
+        box.current.x = drawX;
+        box.current.y = drawY;
+        box.current.w = scaledWidth;
+        box.current.h = scaledHeight;
+
+        // ctx.drawImage(boxImg, drawX, drawY, scaledWidth, scaledHeight);
+        if (box.opened) {
+          // Dibuja la caja abierta (puedes usar otra imagen si prefieres una caja abierta)
+          // Calcular escala para que encaje dentro de 225x225 sin recortar
+          const scale = Math.min(225 / box.prizeImg.width, 225 / box.prizeImg.height);
+
+          // Calcular nuevo tamaño escalado
+          const newWidth = box.prizeImg.width * scale;
+          const newHeight = box.prizeImg.height * scale;
+
+          const recalcularX = ((225 - newWidth) / 2);
+
+          /* // Calcular coordenadas para centrar la imagen
+          const x = (canvas.width - newWidth) / 2;
+          const y = (canvas.height - newHeight) / 2; */
+
+          ctx.drawImage(box.prizeImg, (drawX + (recalcularX > 0 ? recalcularX : 0)), drawY, newWidth, newHeight);
+        } else {
+          // Dibuja la caja cerrada
+          ctx.drawImage(boxImg, drawX, drawY, scaledWidth, scaledHeight);
+        }
+
+
+        // Efecto de brillo al abrir
+        if (box.opened) {
+          const grad = ctx.createRadialGradient(
+            drawX + scaledWidth / 2,
+            drawY + scaledHeight / 2,
+            10,
+            drawX + scaledWidth / 2,
+            drawY + scaledHeight / 2,
+            80
+          );
+          grad.addColorStop(0, "rgba(255,255,150,0.8)");
+          grad.addColorStop(1, "transparent");
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(drawX + scaledWidth / 2, drawY + scaledHeight / 2, 80, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      });
+
+      drawConfetti();
+      requestAnimationFrame(animate);
+    }
+
+    boxImg.onload = () => requestAnimationFrame(animate);
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Explosión de Billetes</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+        }
+        canvas {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+<canvas id="canvas"></canvas>
+
+<script>
+const canvas = document.getElementById('canvas');
+const ctx = canvas.getContext('2d');
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+// Clase Billete para cada billete en la explosión
+class Billete {
+    constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.width = 40;
+        this.height = 40;
+        this.angle = Math.random() * 360;    // Ángulo de rotación aleatorio
+        this.rotationSpeed = Math.random() * 2 - 1;  // Velocidad de rotación
+        this.speedX = (Math.random() * 4 - 2) * 3 * 0.5;  // Velocidad en X en diferentes direcciones el 0.5 es por la mitad de velocidad
+        this.speedY = (Math.random() * 4 - 2) * 3 * 0.5;  // Velocidad en Y en diferentes direcciones el 0.5 es por la mitad de velocidad
+        this.gravity = 0.05; // Gravedad para que los billetes caigan después de la explosión
+        this.image = new Image();
+        this.image.src = 'https://static.vecteezy.com/system/resources/previews/019/857/850/original/coin-money-coin-and-gold-coin-free-png.png';  // Imagen de billete
+    }
+
+    // Actualizar la posición y rotación del billete
+    update() {
+        this.x += this.speedX;
+        this.y += this.speedY;
+        this.speedY += this.gravity; // Aplicar gravedad para que caigan hacia abajo
+        this.angle += this.rotationSpeed;
+
+        // Si el billete sale de la pantalla, reubicarlo fuera de la vista para eliminarlo
+        if (this.y > canvas.height || this.x < -this.width || this.x > canvas.width + this.width) {
+            this.x = -100; // Coloca el billete fuera de la pantalla para simular "desaparición"
+            this.y = -100;
+        }
+    }
+
+    // Dibujar el billete en el canvas
+    draw() {
+        ctx.save();
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        ctx.rotate((this.angle * Math.PI) / 180);
+        ctx.drawImage(this.image, -this.width / 2, -this.height / 2, this.width, this.height);
+        ctx.restore();
+    }
+}
+
+// Array para almacenar los grupos de billetes de cada explosión
+let explosiones = [];
+
+// Función para iniciar una explosión en una posición específica (x, y)
+function iniciarExplosion(x, y) {
+    const billetes = []; // Crear un nuevo grupo de billetes para esta explosión
+    for (let i = 0; i < 5; i++) {
+        billetes.push(new Billete(x, y)); // Crear billetes en el punto de la explosión
+    }
+    explosiones.push(billetes); // Agregar el grupo de billetes al array de explosiones
+}
+
+// Animar las explosiones de billetes
+function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    explosiones.forEach((billetes, index) => {
+        billetes.forEach((billete) => {
+            billete.update();
+            billete.draw();
+        });
+
+        // Filtrar billetes visibles en el canvas para finalizar la explosión
+        explosiones[index] = billetes.filter(b => b.y < canvas.height);
+    });
+
+    // Eliminar explosiones vacías
+    explosiones = explosiones.filter(billetes => billetes.length > 0);
+
+    requestAnimationFrame(animate);
+}
+
+// Iniciar la animación
+animate();
+
+// Puedes ejecutar múltiples explosiones en diferentes posiciones
+/* window.addEventListener("DOMContentLoaded", function () {
+
+    
+    iniciarExplosion(canvas.width/2, canvas.height/2); 
+    iniciarExplosion(canvas.width/2, canvas.height/2); 
+}); */
+
+// O también hacer clic en el canvas para crear explosiones
+const test =[]
+canvas.addEventListener('mousemove', (event) => {
+    const x = event.clientX;
+    const y = event.clientY;
+    test.push({x,y})
+    iniciarExplosion(x, y);
+    console.log('test', test)
+});
+
+
+
+// Ajustar el tamaño del canvas si cambia el tamaño de la ventana
+window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+});
+</script>
+</body>
+</html>

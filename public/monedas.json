@@ -1,0 +1,116 @@
+[
+    {
+      "pais": "Argentina",
+      "moneda": "Peso Argentino",
+      "codigo": "ARS",
+      "simbolo": "$"
+    },
+    {
+      "pais": "Bolivia",
+      "moneda": "Boliviano",
+      "codigo": "BOB",
+      "simbolo": "Bs"
+    },
+    {
+      "pais": "Brasil",
+      "moneda": "Real Brasileño",
+      "codigo": "BRL",
+      "simbolo": "R$"
+    },
+    {
+      "pais": "Chile",
+      "moneda": "Peso Chileno",
+      "codigo": "CLP",
+      "simbolo": "$"
+    },
+    {
+      "pais": "Colombia",
+      "moneda": "Peso Colombiano",
+      "codigo": "COP",
+      "simbolo": "$"
+    },
+    {
+      "pais": "Costa Rica",
+      "moneda": "Colón Costarricense",
+      "codigo": "CRC",
+      "simbolo": "₡"
+    },
+    {
+      "pais": "Cuba",
+      "moneda": "Peso Cubano",
+      "codigo": "CUP",
+      "simbolo": "$"
+    },
+    {
+      "pais": "República Dominicana",
+      "moneda": "Peso Dominicano",
+      "codigo": "DOP",
+      "simbolo": "RD$"
+    },
+    {
+      "pais": "Ecuador",
+      "moneda": "Dólar Estadounidense",
+      "codigo": "USD",
+      "simbolo": "$"
+    },
+    {
+      "pais": "El Salvador",
+      "moneda": "Dólar Estadounidense",
+      "codigo": "USD",
+      "simbolo": "$"
+    },
+    {
+      "pais": "Guatemala",
+      "moneda": "Quetzal",
+      "codigo": "GTQ",
+      "simbolo": "Q"
+    },
+    {
+      "pais": "Honduras",
+      "moneda": "Lempira",
+      "codigo": "HNL",
+      "simbolo": "L"
+    },
+    {
+      "pais": "México",
+      "moneda": "Peso Mexicano",
+      "codigo": "MXN",
+      "simbolo": "$"
+    },
+    {
+      "pais": "Nicaragua",
+      "moneda": "Córdoba",
+      "codigo": "NIO",
+      "simbolo": "C$"
+    },
+    {
+      "pais": "Panamá",
+      "moneda": "Balboa",
+      "codigo": "PAB",
+      "simbolo": "B/."
+    },
+    {
+      "pais": "Paraguay",
+      "moneda": "Guaraní",
+      "codigo": "PYG",
+      "simbolo": "₲"
+    },
+    {
+      "pais": "Perú",
+      "moneda": "Sol",
+      "codigo": "PEN",
+      "simbolo": "S/"
+    },
+    {
+      "pais": "Uruguay",
+      "moneda": "Peso Uruguayo",
+      "codigo": "UYU",
+      "simbolo": "$U"
+    },
+    {
+      "pais": "Venezuela",
+      "moneda": "Bolívar",
+      "codigo": "VES",
+      "simbolo": "Bs."
+    }
+  ]

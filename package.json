@@ -1,0 +1,40 @@
+{
+  "name": "inventarionext",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@reduxjs/toolkit": "^1.9.7",
+    "@zxing/library": "^0.20.0",
+    "antd": "^5.11.4",
+    "bson-objectid": "^2.0.4",
+    "firebase": "^12.1.0",
+    "formik": "^2.4.5",
+    "next": "14.0.3",
+    "p5": "^2.0.1",
+    "pdf-lib": "^1.17.1",
+    "qrcode": "^1.5.3",
+    "react": "^18",
+    "react-dom": "^18",
+    "react-fast-marquee": "^1.6.2",
+    "react-redux": "^8.1.3",
+    "recharts": "^2.15.3",
+    "sweetalert": "^2.1.2",
+    "sweetalert2": "^11.13.2",
+    "uuid": "^9.0.1",
+    "yup": "^1.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/p5": "^1.7.6",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "@types/uuid": "^9.0.8",
+    "typescript": "^5"
+  }
+}
