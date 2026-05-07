@@ -14,7 +14,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
             style={{ objectFit: 'cover' }}
             fill
             priority
-            src="/Leonardo_1.jpg"
+            src="/Leonardo_2.jpg"
             alt="Logo"
             sizes="(max-width: 768px) 100vw, 50vw"
             quality={100}
