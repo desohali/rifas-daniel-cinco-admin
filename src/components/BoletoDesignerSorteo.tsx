@@ -122,6 +122,9 @@ const fontSizeOptions = [
   { label: '48px', value: 48 },
   { label: '56px', value: 56 },
   { label: '64px', value: 64 },
+  { label: '72px', value: 72 },
+  { label: '96px', value: 96 },
+  { label: '124px', value: 124 },
 ];
 
 
