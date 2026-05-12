@@ -16,7 +16,14 @@ import {
   message,
   ColorPicker,
   Table,
-  Slider
+  Slider,
+  Collapse,
+  List,
+  Radio,
+  Tooltip,
+  Popconfirm,
+  Avatar,
+  Image as ImageAnt
 } from 'antd';
 import {
   FontSizeOutlined,
@@ -31,6 +38,8 @@ import type { UploadFile, UploadProps } from 'antd/es/upload/interface';
 import *  as ANTD from 'antd';
 import { setHeightBoleto, setWidthBoleto } from '@/features/adminSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import { useListarDisenioBoletoQuery } from '@/services/userApi';
+import { useParams } from 'next/navigation';
 
 const { Option } = Select;
 const { Text, Title } = Typography;
@@ -135,6 +144,7 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
   loading = false,
   previewDesign = ""
 }) => {
+
   const dispatch = useDispatch();
   // Referencias y estados
   const canvasRef = useRef<any>(null);
@@ -143,7 +153,15 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
   const {
     widthBoleto: width,
     heightBoleto: height,
+    detalleDeCarpeta
   } = useSelector((state: any) => state.admin);
+
+  console.log('width', width)
+  console.log('height', height)
+
+
+  const { data: disenioBoleto = [], refetch } = useListarDisenioBoletoQuery({ _idCarpeta: detalleDeCarpeta?._id });
+
 
   // Estados para el diseño
   const [textInputs, setTextInputs] = useState([
@@ -169,7 +187,8 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
   const [selectedElement, setSelectedElement] = useState<CanvasElement | null>(null);
   const [previewVisible, setPreviewVisible] = useState(false);
   const [previewImage, setPreviewImage] = useState<string | null>(null);
-  console.log('elements :>> ', elements);
+  const [idDisenioBoleto, setIdDisenioBoleto] = React.useState<string>("");
+  // console.log('elements :>> ', elements);
 
   // Variables para el manejo de arrastre
   const [isDragging, setIsDragging] = useState(false);
@@ -177,12 +196,12 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
   const [startY, setStartY] = useState(0);
   const [columns, setColumns] = useState(3);
   const [rows, setRows] = useState(5);
+  const [widthQR, setWidthQR] = useState(180);
   // Cargar imagen predeterminada
-  const loadDefaultImage = () => {
+  const loadDefaultImage = (configuracion: any = {}) => {
     // Puedes usar una URL externa o una ruta a una imagen local en tu proyecto
     // Por ejemplo: '/images/logo.png' o 'https://ejemplo.com/imagen.jpg'
-    const defaultImageUrl = '../../qr180.png'; // Imagen aleatoria de Lorem Picsum (tamaño 200x100)
-
+    const url: string = '../../qr180.png';
     const img = new Image();
     img.crossOrigin = 'anonymous';
 
@@ -191,14 +210,7 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
       // Usar dimensiones originales
       const newWidth = img.width;
       const newHeight = img.height;
-      /* let newWidth = img.width;
-      let newHeight = img.height;
 
-      if (newWidth > width / 3) {
-        const ratio = width / 3 / newWidth;
-        newWidth = width / 3;
-        newHeight = img.height * ratio;
-      } */
 
       // Crear elemento de imagen
       const imageElement: ImageElement = {
@@ -209,7 +221,8 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
         width: newWidth,
         height: newHeight,
         isDragging: false,
-        isSelected: false
+        isSelected: false,
+        ...configuracion
       };
 
       // Agregar la imagen a los elementos
@@ -220,7 +233,7 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
       console.error('Error al cargar la imagen predeterminada');
     };
 
-    img.src = defaultImageUrl;
+    img.src = url;
   };
 
   // Inicializar el canvas
@@ -401,14 +414,78 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
             textId: 13
           },
         ];
+        if (idDisenioBoleto) {
+          const findDisenio = disenioBoleto.find((item: any) => item._id === idDisenioBoleto);
+          if (findDisenio) {
+            const elementsMap = initialElements.map((element: any) => {
+              const findText = (findDisenio?.textos || []).find((t: any) => t.texto === element.text);
+              return {
+                ...element,
+                ...findText,
+              };
+            });
+            // ESTABLECEMOS LAS POSICIONES X Y Y DE LOS ELEMENTOS SEGUN EL DISENIO GUARDADO:
+            const imagenQR = (findDisenio.imagenes[0] || {});
+            loadDefaultImage({
+              ...imagenQR,
+            });
+            setWidthQR(imagenQR?.width || imagenQR?.height || 180);
+            setElements(elementsMap);
 
-        setElements(initialElements);
+            // ESTABLECECEMOS FILAS Y COLUMNAS Y TAMAÑO DEL CANVAS SEGUN EL DISENIO GUARDADO:
+            setColumns(findDisenio?.configuracionDelBoleto?.columns);
+            dispatch(setWidthBoleto(1023 / findDisenio?.configuracionDelBoleto?.columns));
 
-        // Cargar la imagen predeterminada
-        loadDefaultImage();
+            setRows(findDisenio?.configuracionDelBoleto?.rows);
+            dispatch(setHeightBoleto(1705 / findDisenio?.configuracionDelBoleto?.rows));
+
+            // ESTABLECEMOS EL TAMAÑO Y COLORES DE LOS TEXTOS:
+            setTextInputs((prev: any) => {
+              return prev.map((element: any) => {
+                const findText = (findDisenio?.textos || []).find((t: any) => t.texto === element.text);
+                return {
+                  ...element,
+                  ...findText,
+                };
+              });
+            });
+
+            // CARGAMOS LA IMAGEN DE FONDO SI EL DISENIO LA TIENE:
+            // Puedes usar una URL externa o una ruta a una imagen local en tu proyecto
+            // Por ejemplo: '/images/logo.png' o 'https://ejemplo.com/imagen.jpg'
+            const url: string = findDisenio?.urlBackgroundImage;
+            fetch(url)
+              .then(res => res.blob())
+              .then(blob => {
+                const reader = new FileReader();
+
+                reader.onload = (e) => {
+                  const img = new Image();
+                  img.crossOrigin = 'anonymous';
+
+                  img.onload = () => {
+                    setBackgroundImage(img);
+                  };
+
+                  img.src = e.target?.result as string;
+                };
+
+                reader.readAsDataURL(blob);
+              });
+
+
+          } else {
+            message.error('No se encontró el diseño seleccionado');
+          }
+        } else {
+          setElements(initialElements);
+          // Cargar la imagen predeterminada
+          loadDefaultImage();
+        }
+
       }, 100);
     }
-  }, [/* width, height */]);
+  }, [/* width, height */idDisenioBoleto]);
 
   // Redimensionar el canvas cuando cambien width/height SIN reubicar los elementos
   useEffect(() => {
@@ -857,6 +934,71 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
           <Row gutter={[16, 16]}>
             {/* Panel de herramientas */}
             <Col xs={24} md={12} lg={12} xl={12} xxl={12}>
+              <Collapse
+                size="small"
+                style={{
+                  marginBottom: "1rem",
+                }}
+                items={[{
+                  key: '1',
+                  label: 'Seleccione diseño de boleto',
+                  children: (
+                    <List
+                      size="small"
+                      style={{
+                        maxHeight: 400,
+                        overflow: 'auto',
+                      }}
+                      dataSource={disenioBoleto || []}
+                      renderItem={(item: any) => (
+                        <List.Item
+                          style={{ padding: "0.5rem 0rem" }}
+                          actions={[
+                            <Radio
+                              checked={idDisenioBoleto === item._id}
+                              onChange={() => {
+                                setIdDisenioBoleto(item._id);
+                              }}
+                            />,
+                            // <Tooltip title="Eliminar diseño">
+                            //   <Popconfirm
+                            //     title="Eliminar diseño"
+                            //     description="Desea eliminar el diseño ?"
+                            //     okText="Sí, eliminar"
+                            //     cancelText="No, eliminar"
+                            //     onConfirm={async () => {
+                            //       // await eliminarDisenioBoleto({ _idBoleto: item._id }).unwrap();
+                            //       refetch();
+                            //     }}
+                            //     onCancel={async () => {
+
+                            //     }}
+                            //     onOpenChange={() => console.log('open change')}
+                            //   >
+                            //     <Button shape="circle" icon={<DeleteOutlined />} danger />
+                            //   </Popconfirm>
+                            // </Tooltip>
+                          ]}>
+                          <List.Item.Meta
+                            avatar={<Avatar
+                              shape="square"
+                              size={54}
+                              src={(
+                                <ImageAnt
+                                  width="100%"
+                                  height="100%"
+                                  src={item?.urlImagen}
+                                />
+                              )} />}
+                            title={`${item?.configuracionDelBoleto?.columns} X ${item?.configuracionDelBoleto?.rows}`}
+                            description={`${item?.configuracionDelBoleto?.columns} columnas por ${item?.configuracionDelBoleto?.rows} filas`}
+                          />
+                        </List.Item>
+                      )}
+                    />
+                  )
+                }]}
+              />
               <Card
                 title="Textos del diseño"
                 size="small"
@@ -1037,7 +1179,7 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
                 <legend style={{ padding: "0 10px" }}>Tamaño del QR {elements.find((element: any) => element.type === 'image')?.width}</legend>
                 <div style={{ display: "flex", alignItems: "center", gap: "1rem" }}>
                   {/* <span>test</span> */}
-                  <Slider style={{ flex: 1 }} min={90} max={270} defaultValue={180} step={10} onChange={(value) => {
+                  <Slider style={{ flex: 1 }} min={90} max={270} value={widthQR} /* defaultValue={180} */ step={10} onChange={(value) => {
                     const findElement: any = elements.find((element: any) => element.type === 'image');
                     if (findElement) {
                       findElement.width = value;
@@ -1047,6 +1189,8 @@ const BoletoDesignerPuro: React.FC<BoletoDesignerPuroProps> = ({
                       const textos = prev.filter((element: any) => element.type !== 'image');
                       return [...textos, findElement];
                     });
+
+                    setWidthQR(value);
                   }} />
                 </div>
               </fieldset>

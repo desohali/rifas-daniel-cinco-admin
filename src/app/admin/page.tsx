@@ -163,7 +163,10 @@ const App: React.FC = () => {
 
   // Función para manejar el guardado del diseño
   const handleSaveDesignBoleto = async (imageBase64: string, data: any) => {
+/* console.log('imageBase64', imageBase64)
+console.log('data', data)
 
+    return; */
     if (!existeBackgroundImage(data?.backgroundImageUrl)) return;
     setloadingDisenios(true);
     const imagenGenerada: any = await handleUploadDisenioBoleto(imageBase64, detalleDeCarpeta?._id, "imagenGenerada");
