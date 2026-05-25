@@ -490,11 +490,11 @@ const crearBoletoMaster = async (
   // premiosYCantidadParGuarani
   if (parGuaraniEInstantaneo) {
     let imagenes9SinPremio = [];
-    // DIBUJAMOS TODO LO DE INSTANTANEO
     const findPremioPopulate = premiosYCantidadInstantaneo.find((item: any) => item._id === element?.premioInstantaneo);
     const widthImagen = Instantaneo?.fontSize * 2;
+    const labelHeight = Instantaneo?.fontSize; // altura del texto debajo de cada imagen
+
     if (element?.premioInstantaneo) {
-      // tablero ganador
       const imagenes9 = generarTablero2(premiosYCantidadInstantaneo, element?.premioInstantaneo);
 
       let x = Instantaneo?.x;
@@ -503,12 +503,33 @@ const crearBoletoMaster = async (
       for (let index = 0; index < imagenes9.length; index++) {
 
         if (index > 0 && index % 3 === 0) {
-          y += widthImagen;
+          y += widthImagen + (labelHeight / 2); // ✅ espacio para imagen + texto
           x = Instantaneo?.x;
         }
+
         const idPremio = imagenes9[index];
 
+        // Imagen
         ctx.drawImage(idPremio?.imagen, x, y, widthImagen, widthImagen);
+
+        // Rectángulo blanco semitransparente al pie de la imagen
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "white";
+        ctx.fillRect(x, y + widthImagen, widthImagen, labelHeight / 2);
+        ctx.globalAlpha = 1;
+
+        // Texto del premio centrado en el rectángulo
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = Instantaneo?.color;
+        ctx.font = `bold ${Instantaneo?.fontSize * 0.6}px "${Instantaneo?.fontFamily}"`;
+        ctx.fillText(
+          `${MONEDAS.find((item) => item.pais === detalleDeCarpeta.moneda)?.simbolo} ${formatearNumero(idPremio?.premio)}`,
+          x + widthImagen / 2,
+          y + widthImagen + labelHeight / 4
+        );
+        ctx.restore();
 
         x += widthImagen;
       }
@@ -522,12 +543,33 @@ const crearBoletoMaster = async (
       for (let index = 0; index < imagenes9SinPremio.length; index++) {
 
         if (index > 0 && index % 3 === 0) {
-          y += widthImagen;
+          y += widthImagen + (labelHeight / 2); // ✅ espacio para imagen + texto
           x = Instantaneo?.x;
         }
+
         const idPremio = imagenes9SinPremio[index];
 
+        // Imagen
         ctx.drawImage(idPremio?.imagen, x, y, widthImagen, widthImagen);
+
+        // Rectángulo blanco semitransparente al pie de la imagen
+        ctx.save();
+        ctx.globalAlpha = 1;
+        ctx.fillStyle = "white";
+        ctx.fillRect(x, y + widthImagen, widthImagen, labelHeight / 2);
+        ctx.globalAlpha = 1;
+
+        // Texto del premio centrado en el rectángulo
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = Instantaneo?.color;
+        ctx.font = `bold ${Instantaneo?.fontSize * 0.6}px "${Instantaneo?.fontFamily}"`;
+        ctx.fillText(
+          `${MONEDAS.find((item) => item.pais === detalleDeCarpeta.moneda)?.simbolo} ${formatearNumero(idPremio?.premio)}`,
+          x + widthImagen / 2,
+          y + widthImagen + labelHeight / 4
+        );
+        ctx.restore();
 
         x += widthImagen;
       }
@@ -542,7 +584,7 @@ const crearBoletoMaster = async (
     ctx.drawImage(figuraSeleccionada?.imagen, Figura_instantaneo?.x + widthImagen, Figura_instantaneo?.y - (widthImagen / 1.5), widthImagen, widthImagen);
     ctx.drawImage(figuraSeleccionada?.imagen, Figura_instantaneo?.x + widthImagen * 2, Figura_instantaneo?.y - (widthImagen / 1.5), widthImagen, widthImagen);
 
-    // DIBUJAMOS EL RECTANGULO DE FONDO
+    /* // DIBUJAMOS EL RECTANGULO DE FONDO
     const totalWidth = widthImagen * 3;
     const rectHeight = Figura_instantaneo?.fontSize / 1.5;
 
@@ -568,7 +610,7 @@ const crearBoletoMaster = async (
       centerX,
       centerY
     );
-    ctx.restore(); // restauramos TODO
+    ctx.restore(); // restauramos TODO */
 
     // DIBUJAMOS TODO LO DE PAR GUARANI
     const findPremioPopulate2 = premiosYCantidadParGuarani.find((item: any) => item._id === element?.premioParGuarani);
