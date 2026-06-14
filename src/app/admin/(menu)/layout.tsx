@@ -123,7 +123,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
           src="/Leonardo_1.jpg"
           sizes="(max-width: 768px) 100vw, 50vw"
           quality={100}
-          onClick={() => router.replace('/admin')}
+          // onClick={() => router.replace('/admin')}
         />
 
       </Header>
