@@ -50,19 +50,21 @@ const Rifas: React.FC = ({ params }: any) => {
     setCurrent(page);
     listarRifas({ skip: page, _idCarpeta: params?._idCarpeta });
   };
-
+  const { user } = useSelector((state: any) => state.user);
   const { listaDeRifas, isRifa, rifaDetalles, listaDeCarpetas } = useSelector((state: any) => state.admin);
   const [loadingImages, setloadingImages] = React.useState(true);
 
   const [listarRifas, { data, error, isLoading }] = useListarRifasMutation();
-  console.log('rifassssssssssssssssssssssssssssssss', data)
+  console.log('listaDeRifas', listaDeRifas)
 
   React.useEffect(() => {
-    if (params?._idCarpeta) {
+    if (params?._idCarpeta && user) {
       dispatch(setIdCarpeta(params._idCarpeta));
-      listarRifas({ skip: current, _idCarpeta: params?._idCarpeta });
+      if (user?._idRifa) {
+        listarRifas({ skip: current, _idCarpeta: params?._idCarpeta, _idRifa: user?._idRifa });
+      }
     }
-  }, [params?._idCarpeta]);
+  }, [params?._idCarpeta, user]);
 
   React.useEffect(() => {
     if (data) {
@@ -71,11 +73,11 @@ const Rifas: React.FC = ({ params }: any) => {
     }
   }, [data]);
 
-  React.useEffect(() => {
+  /* React.useEffect(() => {
     if (isRifa && params?._idCarpeta) {
       listarRifas({ skip: current, _idCarpeta: params?._idCarpeta });
     }
-  }, [isRifa, params?._idCarpeta]);
+  }, [isRifa, params?._idCarpeta]); */
 
   React.useEffect(() => {
     if (data) {
@@ -95,6 +97,8 @@ const Rifas: React.FC = ({ params }: any) => {
         setloadingImages(false);
       }); */
       setTotal(data?.count);
+    } else {
+      setloadingImages(false);
     }
   }, [data]);
 
@@ -233,7 +237,7 @@ const Rifas: React.FC = ({ params }: any) => {
 
         </Col>
         <Col className="gutter-row" xs={24} sm={12} md={12} lg={8}>
-          <Flex vertical gap="small" style={{ width: '100%', marginBottom: '12px' }}>
+          {/* <Flex vertical gap="small" style={{ width: '100%', marginBottom: '12px' }}>
             <Button size='large' type="primary" onClick={() => {
               dispatch(setRifaDetalles(null));
               dispatch(setOpenFormRifa(true));
@@ -241,7 +245,7 @@ const Rifas: React.FC = ({ params }: any) => {
             }} icon={<PlusOutlined />}>
               Registrar rifa
             </Button>
-          </Flex>
+          </Flex> */}
           <FormRifa formRifa={formRifa} />
           {rifaDetalles && <FormBoleto />}
         </Col>

@@ -184,7 +184,7 @@ const FormBoletosAutomaticos = () => {
         </Row>
       </Form>
 
-      <Row gutter={16}>
+      {/* <Row gutter={16}>
         <Col span={24}>
           <List
             style={{ maxHeight: "300px", overflowY: "auto", marginTop: "1.5rem" }}
@@ -229,7 +229,7 @@ const FormBoletosAutomaticos = () => {
             }}
           />
         </Col>
-      </Row>
+      </Row> */}
     </>
 
   )

@@ -1,7 +1,7 @@
 "use client";
 import React from 'react';
 import { EyeOutlined, EditOutlined, CloudDownloadOutlined, DeleteOutlined, QrcodeOutlined, AimOutlined, SyncOutlined, GiftOutlined, CarryOutOutlined, DownloadOutlined } from '@ant-design/icons';
-import { Badge, Button, Card, Col, Divider, message, Modal, Popconfirm, Radio, Row, Space, Spin, Switch, Tag, Tooltip, Typography } from 'antd';
+import { Badge, Button, Card, Col, Divider, Flex, message, Modal, Popconfirm, Radio, Row, Space, Spin, Switch, Tag, Tooltip, Typography } from 'antd';
 import { useParams, useRouter } from 'next/navigation';
 import { setImagenRifa, setIsRifa, setListaDeBoletos, setOpenFormBoleto, setOpenFormRifa, setRifaDetalles } from '@/features/adminSlice';
 import { useDispatch, useSelector } from 'react-redux';
@@ -682,7 +682,7 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
   const [ordenarBoletos, setOrdenarBoletos] = React.useState(false);
   // const [raspaYGana, setRaspaYGana] = React.useState(false);
   const [parGuaraniEInstantaneo, setParGuaraniEInstantaneo] = React.useState(false);
-
+  const { user } = useSelector((state: any) => state.user);
 
   const descargarBoletos3 = async (boletos: any[], bloque: number) => {
     // boletos = boletos.slice(0, 10);
@@ -1006,8 +1006,15 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
       onClick={(event: any) => {
         // Verifica si el elemento clicado es un <canvas>
         if (event.target.tagName.toLowerCase() === 'canvas') {
-          setloadingRoute(true);
-          router.push(`/admin/sorteos/${rifa._id}`);
+          if (user?.rifas?.sorteo) {
+            setloadingRoute(true);
+            router.push(`/admin/sorteos/${rifa._id}`);
+          } else {
+            message.info("Usuario no autorizado para el sorteo!")
+
+          }
+
+
         }
       }}
       hoverable
@@ -1024,67 +1031,16 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
         </Spin>
       )}
       actions={[
-        <Tooltip title="Editar">
-          <Button size={window?.innerWidth > 768 ? 'middle' : 'small'} type="primary" onClick={(e) => {
-            e.stopPropagation();
-            dispatch(setOpenFormRifa(true));
-            dispatch(setRifaDetalles(rifa));
-            formRifa.resetFields();
-            formRifa.setFieldsValue(rifa);
-          }} shape="circle" icon={<EditOutlined />} />
-        </Tooltip>,
-        <Tooltip title="Descargar">
-          <Button size={window?.innerWidth > 768 ? 'middle' : 'small'} type="primary" onClick={async (e) => {
-            e.stopPropagation();
-            setPreviewVisible(true);
-          }} shape="circle" icon={<CloudDownloadOutlined />} />
-
-        </Tooltip>,
-        <Tooltip title="Ganadores QR">
-          <Button size={window?.innerWidth > 768 ? 'middle' : 'small'} type="primary" onClick={async (e) => {
+        <Flex vertical gap="small" style={{ width: '100%', padding: "0px 1rem" }}>
+          <Button type="primary" block size={window?.innerWidth > 768 ? 'middle' : 'small'} onClick={async (e) => {
             e.stopPropagation();
             dispatch(setOpenFormBoleto(true));
             dispatch(setRifaDetalles(rifa));
-          }} shape="circle" icon={<QrcodeOutlined />} />
-        </Tooltip>,
-        <Tooltip title="Eliminar">
-          <Button loading={responseEliminar.isLoading} size={window?.innerWidth > 768 ? 'middle' : 'small'} type="primary" danger onClick={async (e) => {
-            e.stopPropagation();
-            const { isConfirmed, value } = await Swal.fire({
-              icon: "question",
-              input: "text",
-              title: "Seguro que deseas eliminar esta rifa ?",
-              text: "Ingresa el PIN de seguridad",
-              showDenyButton: true,
-              showCancelButton: false,
-              confirmButtonText: "Si",
-              denyButtonText: "No",
-              inputValidator: (value) => {
-                if (!/[0-9]{4}/.test(value)) {
-                  return "Ingresa el PIN de seguridad!";
-                }
-              }
-            });
+          }} icon={<QrcodeOutlined />} >
+            Ganadores QR
+          </Button>
+        </Flex>
 
-            if (isConfirmed) {
-              if (value == 1991) {
-                await eliminarRifa({ _idRifa: rifa._id });
-
-                dispatch(setIsRifa(true));
-                setTimeout(() => { dispatch(setIsRifa(false)) }, 50);
-              } else {
-                Swal.fire({
-                  title: "PIN incorrecto!",
-                  text: "",
-                  icon: "info"
-                });
-              }
-
-            }
-            /* dispatch(setOpenFormBoleto(true));
-            dispatch(setRifaDetalles(rifa)); */
-          }} shape="circle" icon={<DeleteOutlined />} />
-        </Tooltip>,
       ]}
     >
       <Row gutter={12} style={{ paddingBottom: "1rem" }}>
@@ -1124,10 +1080,10 @@ const CardRifa: React.FC<{ rifa: any, formRifa: any }> = ({ rifa, formRifa }: an
       )} />
 
 
-      <Divider style={{ marginTop: "1rem", marginBottom: "0.5rem" }} />
+      {/* <Divider style={{ marginTop: "1rem", marginBottom: "0.5rem" }} />
       <Typography.Link href={`${location?.origin}/google/${rifa?._id}?_idCarpeta=${params?._idCarpeta}`} strong target="_blank">
         <CarryOutOutlined /> Detalles de la rifa
-      </Typography.Link>
+      </Typography.Link> */}
 
 
 

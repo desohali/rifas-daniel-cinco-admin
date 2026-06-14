@@ -65,7 +65,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
   );
 
   const MENU_LATERAL: any[] = [
-    {
+    /* {
       key: '1',
       icon: <GiftOutlined style={{ fontSize: '18px', color: '#1890ff' }} />,
       label: <span style={{ fontWeight: 'bold' }}>RIFAS</span>,
@@ -89,7 +89,7 @@ const layout = ({ children }: { children: React.ReactNode }) => {
       key: '5',
       icon: <BarChartOutlined style={{ fontSize: '18px', color: '#1890ff' }} />,
       label: <span style={{ fontWeight: 'bold' }}>REPORTES</span>,
-    },
+    }, */
   ];
 
   if (user && user?.tipoUsuario == "a") {

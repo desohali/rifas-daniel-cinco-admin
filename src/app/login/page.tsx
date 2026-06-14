@@ -27,7 +27,7 @@ const App: React.FC = () => {
   React.useEffect(() => {
 
     if (data) {
-      if ((!data?._idCarpeta || data.tipoUsuario == "v") && data?.tipoUsuario != "s") {
+      if ((!data?._idCarpeta || data.tipoUsuario == "v" || !data?.estado) && data?.tipoUsuario != "s") {
         dispatch(setUser(null));
         swal("", "Usuario no autorizado!", "error");
         window.localStorage.removeItem("usuarioLuis");
@@ -66,7 +66,7 @@ const App: React.FC = () => {
       if (user?.tipoUsuario == "s") {
         router.push('/admin');
       } else if (user?.tipoUsuario == "a") {
-        router.push(`/admin/usuarios/${user?._idCarpeta}`);
+        router.push(`/admin/rifas/${user?._idCarpeta}}`);
       }
 
     }
@@ -109,7 +109,7 @@ const App: React.FC = () => {
             }}
             onFinish={async (values) => {
               const { data }: any = await autenticarUsuario(values);
-              if (!data || data?.tipoUsuario == "v") {
+              if (!data || data?.tipoUsuario == "v" || !data?.estado) {
                 swal("Alerta", "Usuario no autorizado!", "warning");
               }
             }}

@@ -71,13 +71,13 @@ const FormBoleto: React.FC = () => {
           block
           options={[
             { value: 'random', label: 'Automáticos', icon: <SyncOutlined spin /> },
-            { value: 'manual', label: 'Manuales', icon: <FormOutlined /> },
-            { value: 'especial', label: 'Especiales', icon: <GiftOutlined /> },
+            /* { value: 'manual', label: 'Manuales', icon: <FormOutlined /> },
+            { value: 'especial', label: 'Especiales', icon: <GiftOutlined /> }, */
           ]}
           value={value}
           onChange={(value: any) => setValue(value)}
         />
-        <Segmented
+        {/* <Segmented
           size="large"
           block
           options={[
@@ -87,7 +87,7 @@ const FormBoleto: React.FC = () => {
           ]}
           value={value}
           onChange={(value: any) => setValue(value)}
-        />
+        /> */}
 
       </div>
 
